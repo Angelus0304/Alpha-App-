@@ -16,6 +16,16 @@ npx expo start --web
 This repository is an Expo app, not a Vite app. The Expo web runtime is installed
 for browser testing; use `npx expo start` for native simulator/device workflows.
 
+## Styling with Tailwind
+
+The app uses NativeWind to apply Tailwind utility classes to React Native
+components. Babel, Metro, and `tailwind.config.js` are configured, and
+`global.css` is loaded from the app entry point. For example:
+
+```jsx
+<Text className="text-lg font-bold text-emerald-700">Welcome</Text>
+```
+
 ## Supabase setup
 
 1. Create a Supabase project and set `EXPO_PUBLIC_SUPABASE_URL` and
