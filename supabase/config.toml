@@ -1,0 +1,2 @@
+[functions.sync-new-user]
+verify_jwt = false

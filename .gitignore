@@ -30,8 +30,15 @@ yarn-error.*
 
 # Env files
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+
+# Service credentials and local Supabase state
+*service-account*.json
+*service-role*
+*credentials*.json
+secrets/
+supabase/.temp/
 
 # EAS
 .eas/

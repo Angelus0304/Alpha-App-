@@ -1,112 +1,57 @@
-# Alpha Business Concepts (ABC)
+# Alpha Business Concepts
 
-A React Native (Expo) app guiding South African business owners to sustainability
-and growth — Marketing, Tech & Software, Human Resources, Forms & Templates, and
-a Knowledge Base, all reachable from a single dashboard.
+Expo application with Google sign-in through Supabase, private user profiles,
+private snippets with Postgres realtime updates, and an optional new-user export
+to Google Sheets.
 
-## App map
+## Run locally
 
-```
-Login (User Login / Main Page)
-  -> Dashboard (5 header buttons)
-       -> Marketing            (a-i: Logo Creation ... Ad Creation)
-       -> Tech and Software    (a-l: Website Setup ... Telecoms/ISP)
-       -> Human Resources      (a-h: Labour Law ... Online Courses)
-       -> Forms and Templates  (a: Enter Portal -> external link)
-       -> Knowledge Base       (a-g: FAQ's ... Different Industry Sectors)
-```
-
-Every header button on the Dashboard opens a **Category** screen listing its
-lettered sub-items; tapping a sub-item opens an **Item Detail** screen.
-
-## Project structure
-
-```
-App.js                        entry point
-src/
-  navigation/RootNavigator.js  stack navigator + auto-login check
-  screens/
-    LoginScreen.js             User Login / Main Page
-    DashboardScreen.js         header buttons (categories)
-    CategoryScreen.js          lettered sub-item list for a category
-    ItemDetailScreen.js        renders info / link / list content
-  data/appData.js              ALL category + sub-item content lives here
-  components/                  CategoryButton, ListItem, ScreenHeader
-  theme/colors.js              brand colors, spacing, radius tokens
-assets/                        icon.png, adaptive-icon.png, splash.png, favicon.png
-```
-
-**To edit any screen's copy, wording, or sub-items, edit `src/data/appData.js`.**
-That one file drives navigation and content for every category — you don't need
-to touch screen code to change text, add a new sub-item, or reorder items.
-
-## What's real vs. what's a placeholder
-
-- **Real & working:** navigation flow, all 5 categories, all ~44 sub-items,
-  login gate (session persisted with AsyncStorage), external link handling
-  (Forms and Templates), list-style Knowledge Base screens.
-- **Placeholder / to wire up before launch:**
-  - **Authentication** — `LoginScreen.js` currently mocks login (any
-    email/password works, stored locally). Connect it to a real backend
-    (e.g. Firebase Auth, Supabase Auth, or your own API).
-  - **"Get Started" buttons** on info screens are stubs — wire them to
-    whatever action each service needs (a form, a request, a booking flow,
-    a payment, etc.).
-  - **Contact numbers, department names, and links** in `appData.js` under
-    Knowledge Base are best-effort references — verify and update them
-    before shipping (government contact details change).
-  - Some Tech & Software items (CRM, POS, App Development, Chat-Bots) are
-    themselves large product categories — decide whether ABC will build
-    these in-house, integrate a third-party provider, or route users to a
-    request/quote form.
-
-## Running the app locally
-
-```bash
+```sh
 npm install
-npm start          # opens Expo Dev Tools / QR code
-# then press "i" for iOS simulator, "a" for Android emulator,
-# or scan the QR code with the Expo Go app on your phone
+cp .env.example .env
+# Set the Supabase project URL and publishable/anon key in .env
+npx expo start --web
 ```
 
-Requires Node.js 18+, and Xcode (for iOS simulator) or Android Studio
-(for Android emulator) if not testing on a physical device.
+This repository is an Expo app, not a Vite app. The Expo web runtime is installed
+for browser testing; use `npx expo start` for native simulator/device workflows.
 
-## Building for the App Store / Google Play
+## Supabase setup
 
-This project is set up for [EAS Build](https://docs.expo.dev/build/introduction/),
-Expo's cloud build service:
+1. Create a Supabase project and set `EXPO_PUBLIC_SUPABASE_URL` and
+   `EXPO_PUBLIC_SUPABASE_ANON_KEY` in `.env`. Only the publishable/anon key may
+   be used in the client; never put a service-role key in an `EXPO_PUBLIC_`
+   variable.
+2. Apply `supabase/migrations/20261002000000_profiles_snippets.sql` using the
+   Supabase SQL editor or Supabase CLI (`npx supabase login`, `npx supabase link`,
+   then `npx supabase db push`). The migration creates `user_profiles` and
+   `snippets`, installs row-level security policies, adds the new-user profile
+   trigger, and adds both tables to `supabase_realtime`.
+3. In Supabase Authentication, enable Google and enter the OAuth client ID and
+   secret from Google Cloud. Add the Supabase callback URL shown by the provider
+   settings to the Google OAuth client's authorized redirect URIs. Add the app
+   callback (`alphabusinessconcepts://auth/callback`) and the local web callback
+   (`http://localhost:8081/auth/callback`) to Supabase's allowed redirect URLs.
 
-```bash
-npm install -g eas-cli
-eas login
-eas build:configure
-eas build --platform ios
-eas build --platform android
-```
+The snippets table currently scopes each user's rows to that user. The realtime
+subscription therefore only returns rows permitted by the same RLS policies.
 
-Then submit with:
+## Google Sheets user export
 
-```bash
-eas submit --platform ios
-eas submit --platform android
-```
+1. Create a Google Sheet with a `Users` tab and share it with a Google Cloud
+   service account that has the Google Sheets API enabled and Editor access.
+   The first row is a header: `Supabase user ID`, `Email`, `Name`, `Avatar URL`,
+   `Created at`.
+2. Set Supabase function secrets `GOOGLE_SERVICE_ACCOUNT_JSON`,
+   `GOOGLE_SPREADSHEET_ID`, `GOOGLE_SHEET_NAME` (optional; defaults to `Users`),
+   and a long random `SHEETS_WEBHOOK_SECRET`. Do not commit the service account
+   JSON or any secret values.
+3. Deploy `supabase/functions/sync-new-user` with
+   `npx supabase functions deploy sync-new-user`.
+4. Create a Database Webhook for `auth.users` INSERT events. Send it to
+   `https://<project-ref>.supabase.co/functions/v1/sync-new-user` and add the
+   header `x-webhook-secret` with the same `SHEETS_WEBHOOK_SECRET` value.
 
-You'll need:
-- An Apple Developer account ($99/year) for `bundleIdentifier`
-  `com.alphabusinessconcepts.app` (change this in `app.json` if needed)
-- A Google Play Console account ($25 one-time) for `package`
-  `com.alphabusinessconcepts.app`
-- Your own app icon/splash artwork for production (placeholders are in
-  `/assets` — an "ABC" navy-and-amber badge — swap these for final artwork)
-
-## Next steps worth prioritizing
-
-1. Replace mock login with real authentication.
-2. Decide which Tech & Software items are actual built-in tools vs.
-   request/lead-generation forms that route to a human team.
-3. Verify every phone number, URL, and department name in the Knowledge
-   Base section.
-4. Add real icon/splash artwork sized per Apple/Google guidelines
-   (1024x1024 icon, etc. — current placeholders are already sized correctly,
-   just need final branding).
+The function checks the sheet for the Supabase user ID before appending, to
+avoid duplicate rows on webhook retries. The webhook and Google credentials
+remain server-side.

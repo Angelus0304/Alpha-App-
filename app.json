@@ -3,15 +3,9 @@
     "name": "Alpha Business Concepts",
     "slug": "alpha-business-concepts",
     "version": "1.0.0",
+    "scheme": "alphabusinessconcepts",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#122A45"
-    },
-    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.alphabusinessconcepts.app"
@@ -23,8 +17,9 @@
       },
       "package": "com.alphabusinessconcepts.app"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": [
+      "expo-status-bar",
+      "expo-web-browser"
+    ]
   }
 }
