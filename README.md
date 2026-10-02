@@ -26,6 +26,24 @@ components. Babel, Metro, and `tailwind.config.js` are configured, and
 <Text className="text-lg font-bold text-emerald-700">Welcome</Text>
 ```
 
+## Store builds
+
+Store builds use EAS Build. Sign in with an Expo account using `npx eas-cli login`.
+For iOS, an Apple Developer account and App Store distribution credentials are
+required; EAS can guide you through setting up signing credentials. For Google
+Play, configure Android signing credentials when prompted, then upload the
+resulting `.aab` to Play Console.
+
+```sh
+npm run build:android # Android App Bundle (.aab)
+npm run build:ios     # iOS App Store build (.ipa)
+npm run build:store   # Build both platforms
+```
+
+The app uses bundle identifier `com.alphabusinessconcepts.app` on both
+platforms. The Android adaptive icon path in `app.json` must point to a real
+`assets/adaptive-icon.png` before the Android store build can complete.
+
 ## Supabase setup
 
 1. Create a Supabase project and set `EXPO_PUBLIC_SUPABASE_URL` and

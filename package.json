@@ -7,13 +7,17 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build:android": "npx eas-cli build --platform android --profile production",
+    "build:ios": "npx eas-cli build --platform ios --profile production",
+    "build:store": "npx eas-cli build --platform all --profile production"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
+    "@supabase/server": "^1.9.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.2",
     "babel-preset-expo": "~57.0.0",
