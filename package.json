@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "private": true,
+  "packageManager": "npm@11.19.0",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
